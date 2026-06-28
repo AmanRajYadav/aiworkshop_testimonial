@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AI Workshop — Share Your Experience</title>
+  <title>Tark AI Workshop — Share Your Experience</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -208,17 +208,8 @@
   <!-- ─── HEADER ─── -->
   <header class="fixed top-0 left-0 right-0 z-50 glass">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-          </svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;line-height:1.2;">AI Workshop</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.4);">Testimonials</div>
-        </div>
-      </div>
+      <!-- Tark logo -->
+      <img src="logo.png" alt="Tark" style="height:28px;filter:invert(0);opacity:0.92;" />
       <nav class="flex gap-1">
         <button id="nav-submit" class="nav-pill active" onclick="showView('submit')">Share</button>
         <button id="nav-gallery" class="nav-pill inactive" onclick="showView('gallery')">
@@ -235,11 +226,30 @@
 
       <!-- Hero -->
       <div class="text-center mb-7 fade-up">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium text-indigo-300 mb-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium text-indigo-300 mb-5">
           <div class="live-dot"></div>
           Today's session
         </div>
-        <h1 style="font-size:clamp(22px,5vw,30px);font-weight:800;line-height:1.2;background:linear-gradient(135deg,#ffffff,#c7d2fe,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+
+        <!-- Host card -->
+        <div class="flex items-center justify-center gap-4 mb-5">
+          <div style="position:relative;flex-shrink:0;">
+            <!-- Gradient ring -->
+            <div style="background:linear-gradient(135deg,#6366f1,#a78bfa,#ec4899);border-radius:50%;padding:2.5px;display:inline-block;">
+              <img src="host.png" alt="Aman Raj Yadav"
+                style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;display:block;filter:grayscale(10%) contrast(1.05);" />
+            </div>
+            <!-- Live badge -->
+            <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:#22c55e;border-radius:50%;border:2px solid #1a1a3e;"></div>
+          </div>
+          <div class="text-left">
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px;">Hosted by</div>
+            <div style="font-size:17px;font-weight:700;line-height:1.2;color:#fff;">Aman Raj Yadav</div>
+            <div style="font-size:12px;color:rgba(165,180,252,0.75);margin-top:2px;">AI Workshop</div>
+          </div>
+        </div>
+
+        <h1 style="font-size:clamp(22px,5vw,28px);font-weight:800;line-height:1.25;background:linear-gradient(135deg,#ffffff,#c7d2fe,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
           How was your experience?
         </h1>
         <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:6px;">
@@ -343,8 +353,10 @@
   <div id="view-gallery" class="hidden min-h-screen pt-24 pb-12 px-4">
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-8 fade-up">
+        <img src="logo.png" alt="Tark" style="height:22px;opacity:0.7;margin:0 auto 12px;" />
         <h2 style="font-size:22px;font-weight:700;">Workshop Experiences</h2>
-        <p id="gallery-subtitle" style="font-size:13px;color:rgba(255,255,255,0.35);margin-top:4px;"></p>
+        <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:3px;">Hosted by Aman Raj Yadav</p>
+        <p id="gallery-subtitle" style="font-size:13px;color:rgba(165,180,252,0.6);margin-top:4px;"></p>
       </div>
       <div id="gallery-grid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));"></div>
       <div id="gallery-empty" class="hidden text-center py-20" style="color:rgba(255,255,255,0.25);">
