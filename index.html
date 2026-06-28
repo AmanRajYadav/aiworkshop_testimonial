@@ -12,29 +12,41 @@
     * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; }
 
     body {
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #1a1a3e 100%);
+      background: linear-gradient(150deg, #fff8f0 0%, #ffecd2 45%, #ffd6b0 100%);
       min-height: 100vh;
     }
 
-    .glass {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.1);
+    /* Subtle noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
     }
 
+    /* Header */
+    .glass {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(249,115,22,0.12);
+      box-shadow: 0 1px 12px rgba(249,115,22,0.06);
+    }
+
+    /* Form card */
     .glass-card {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.88);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(249,180,100,0.25);
+      box-shadow: 0 4px 32px rgba(249,115,22,0.08);
     }
 
     /* Inputs */
     .field {
-      background: rgba(255,255,255,0.07);
-      border: 1.5px solid rgba(255,255,255,0.12);
-      color: white;
+      background: #fffaf5;
+      border: 1.5px solid #fcd9b0;
+      color: #3d2c1e;
       width: 100%;
       border-radius: 12px;
       padding: 12px 16px;
@@ -43,32 +55,32 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .field:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.2);
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
     }
-    .field::placeholder { color: rgba(255,255,255,0.3); }
+    .field::placeholder { color: #c4a882; }
 
     /* Photo area */
     .photo-drop {
-      background: rgba(99,102,241,0.08);
-      border: 2px dashed rgba(99,102,241,0.35);
+      background: rgba(249,115,22,0.05);
+      border: 2px dashed rgba(249,115,22,0.3);
       border-radius: 16px;
       cursor: pointer;
       transition: all 0.25s;
     }
     .photo-drop:hover, .photo-drop.active {
-      background: rgba(99,102,241,0.16);
-      border-color: rgba(99,102,241,0.65);
+      background: rgba(249,115,22,0.1);
+      border-color: rgba(249,115,22,0.6);
     }
 
     /* Stars */
-    .star { cursor: pointer; font-size: 24px; color: rgba(255,255,255,0.15); transition: color 0.15s, transform 0.15s; }
-    .star:hover, .star.lit { color: #fbbf24; }
+    .star { cursor: pointer; font-size: 26px; color: #e8cba8; transition: color 0.15s, transform 0.15s; }
+    .star:hover, .star.lit { color: #f97316; }
     .star:hover { transform: scale(1.15); }
 
     /* Buttons */
     .btn-primary {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #f97316, #fb923c);
       color: white;
       font-weight: 600;
       font-size: 14px;
@@ -85,56 +97,56 @@
     }
     .btn-primary:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+      box-shadow: 0 10px 28px rgba(249,115,22,0.35);
     }
     .btn-primary:active:not(:disabled) { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
     .btn-ghost {
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.7);
+      background: rgba(249,115,22,0.08);
+      color: #c2601a;
       font-size: 13px;
       border-radius: 8px;
       padding: 8px 16px;
-      border: none;
+      border: 1px solid rgba(249,115,22,0.18);
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-ghost:hover { background: rgba(255,255,255,0.14); color: white; }
+    .btn-ghost:hover { background: rgba(249,115,22,0.15); }
 
     /* Nav pill */
     .nav-pill { font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 999px; border: none; cursor: pointer; transition: all 0.2s; }
-    .nav-pill.active { background: rgba(255,255,255,0.12); color: white; }
-    .nav-pill.inactive { background: transparent; color: rgba(255,255,255,0.45); }
-    .nav-pill.inactive:hover { color: white; }
+    .nav-pill.active { background: rgba(249,115,22,0.12); color: #c2540a; font-weight: 600; }
+    .nav-pill.inactive { background: transparent; color: #b08060; }
+    .nav-pill.inactive:hover { color: #c2540a; background: rgba(249,115,22,0.06); }
 
     /* Testimonial card */
     .t-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(249,180,100,0.2);
       border-radius: 18px;
-      transition: transform 0.25s, background 0.25s, box-shadow 0.25s;
+      box-shadow: 0 2px 16px rgba(249,115,22,0.06);
+      transition: transform 0.25s, box-shadow 0.25s;
     }
     .t-card:hover {
       transform: translateY(-4px);
-      background: rgba(255,255,255,0.09);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      box-shadow: 0 16px 40px rgba(249,115,22,0.13);
     }
 
     /* Avatar ring */
     .avatar-wrap {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+      background: linear-gradient(135deg, #f97316, #fb7185, #86efac);
       padding: 2.5px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .avatar-inner { border-radius: 50%; overflow: hidden; }
+    .avatar-inner { border-radius: 50%; overflow: hidden; background: white; }
 
     /* Spinner */
     .spin {
       width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.25);
-      border-top-color: white;
+      border: 2px solid rgba(249,115,22,0.2);
+      border-top-color: #f97316;
       border-radius: 50%;
       animation: spinning 0.7s linear infinite;
     }
@@ -170,9 +182,9 @@
 
     /* Error */
     .error-box {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #fca5a5;
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #b91c1c;
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 13px;
@@ -181,40 +193,41 @@
     /* Scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(129,140,248,0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.25); border-radius: 4px; }
 
     /* Label */
-    .lbl { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+    .lbl { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #b08060; margin-bottom: 8px; }
 
     /* Photo option sheet */
     .option-sheet {
-      background: rgba(30,27,75,0.95);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,252,248,0.98);
+      border: 1px solid #fcd9b0;
       border-radius: 14px;
       overflow: hidden;
       margin-top: 8px;
+      box-shadow: 0 4px 20px rgba(249,115,22,0.1);
     }
     .option-btn {
-      width: 100%; background: none; border: none; color: rgba(255,255,255,0.8);
+      width: 100%; background: none; border: none; color: #6b4226;
       font-size: 13px; padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px;
       transition: background 0.15s;
     }
-    .option-btn:hover { background: rgba(255,255,255,0.08); color: white; }
-    .option-divider { height: 1px; background: rgba(255,255,255,0.08); }
+    .option-btn:hover { background: rgba(249,115,22,0.06); }
+    .option-divider { height: 1px; background: #fcd9b0; }
   </style>
 </head>
-<body class="text-white min-h-screen">
+<body class="min-h-screen" style="color:#3d2c1e;">
 
   <!-- ─── HEADER ─── -->
   <header class="fixed top-0 left-0 right-0 z-50 glass">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
       <!-- Tark logo -->
-      <img src="logo.png" alt="Tark" style="height:28px;filter:invert(0);opacity:0.92;" />
+      <img src="logo.png" alt="Tark" style="height:28px;filter:brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(10deg);opacity:0.9;" />
       <nav class="flex gap-1">
         <button id="nav-submit" class="nav-pill active" onclick="showView('submit')">Share</button>
         <button id="nav-gallery" class="nav-pill inactive" onclick="showView('gallery')">
           Wall
-          <span id="gallery-badge" class="hidden ml-1 text-indigo-300"></span>
+          <span id="gallery-badge" class="hidden ml-1" style="color:#f97316;font-weight:600;"></span>
         </button>
       </nav>
     </div>
@@ -226,7 +239,7 @@
 
       <!-- Hero -->
       <div class="text-center mb-7 fade-up">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium text-indigo-300 mb-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5" style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);font-size:12px;font-weight:500;color:#c2540a;">
           <div class="live-dot"></div>
           Today's session
         </div>
@@ -235,24 +248,24 @@
         <div class="flex items-center justify-center gap-4 mb-5">
           <div style="position:relative;flex-shrink:0;">
             <!-- Gradient ring -->
-            <div style="background:linear-gradient(135deg,#6366f1,#a78bfa,#ec4899);border-radius:50%;padding:2.5px;display:inline-block;">
+            <div style="background:linear-gradient(135deg,#f97316,#fb7185,#86efac);border-radius:50%;padding:2.5px;display:inline-block;">
               <img src="host.png" alt="Aman Raj Yadav"
-                style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;display:block;filter:grayscale(10%) contrast(1.05);" />
+                style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;display:block;" />
             </div>
             <!-- Live badge -->
-            <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:#22c55e;border-radius:50%;border:2px solid #1a1a3e;"></div>
+            <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:#22c55e;border-radius:50%;border:2px solid #fff8f0;"></div>
           </div>
           <div class="text-left">
-            <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px;">Hosted by</div>
-            <div style="font-size:17px;font-weight:700;line-height:1.2;color:#fff;">Aman Raj Yadav</div>
-            <div style="font-size:12px;color:rgba(165,180,252,0.75);margin-top:2px;">AI Workshop</div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#b08060;margin-bottom:2px;">Hosted by</div>
+            <div style="font-size:17px;font-weight:700;line-height:1.2;color:#3d2c1e;">Aman Raj Yadav</div>
+            <div style="font-size:12px;color:#f97316;font-weight:500;margin-top:2px;">AI Workshop</div>
           </div>
         </div>
 
-        <h1 style="font-size:clamp(22px,5vw,28px);font-weight:800;line-height:1.25;background:linear-gradient(135deg,#ffffff,#c7d2fe,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+        <h1 style="font-size:clamp(22px,5vw,28px);font-weight:800;line-height:1.25;background:linear-gradient(135deg,#c2540a,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
           How was your experience?
         </h1>
-        <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:6px;">
+        <p style="font-size:13px;color:#a07850;margin-top:6px;">
           Your feedback helps us make the next one even better.
         </p>
       </div>
@@ -265,12 +278,12 @@
           <label class="lbl">Your Photo</label>
           <div id="photo-drop" class="photo-drop p-5 flex flex-col items-center gap-2" onclick="togglePhotoSheet()">
             <div id="photo-placeholder-ui">
-              <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="rgba(129,140,248,0.7)" stroke-width="1.4" style="margin:0 auto 6px;">
+              <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="rgba(249,115,22,0.6)" stroke-width="1.4" style="margin:0 auto 6px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              <p style="font-size:13px;color:rgba(255,255,255,0.45);text-align:center;">Tap to add your photo</p>
-              <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:3px;">Camera or gallery</p>
+              <p style="font-size:13px;color:#a07850;text-align:center;">Tap to add your photo</p>
+              <p style="font-size:11px;color:#c4a882;text-align:center;margin-top:3px;">Camera or gallery</p>
             </div>
             <div id="photo-preview-ui" class="hidden flex-col items-center gap-2">
               <div class="avatar-wrap">
@@ -278,19 +291,19 @@
                   <img id="photo-preview-img" style="width:72px;height:72px;object-fit:cover;" />
                 </div>
               </div>
-              <p style="font-size:11px;color:rgba(255,255,255,0.4);">Tap to change</p>
+              <p style="font-size:11px;color:#c4a882;">Tap to change</p>
             </div>
             <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="onPhotoSelected(event)" />
           </div>
           <!-- Option sheet -->
           <div id="photo-sheet" class="option-sheet hidden">
             <button class="option-btn" onclick="captureCamera()">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#818cf8" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               Take Photo
             </button>
             <div class="option-divider"></div>
             <button class="option-btn" onclick="pickGallery()">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#818cf8" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               Choose from Gallery
             </button>
           </div>
@@ -311,7 +324,7 @@
             <span class="star" data-v="3" onclick="setRating(3)">★</span>
             <span class="star" data-v="4" onclick="setRating(4)">★</span>
             <span class="star" data-v="5" onclick="setRating(5)">★</span>
-            <span id="rating-label" style="font-size:12px;color:rgba(255,255,255,0.3);margin-left:8px;"></span>
+            <span id="rating-label" style="font-size:12px;color:#f97316;font-weight:500;margin-left:8px;"></span>
           </div>
         </div>
 
@@ -339,8 +352,8 @@
   <div id="view-success" class="hidden min-h-screen flex items-center justify-center px-4 pt-20">
     <div class="w-full max-w-sm text-center pop-in">
       <div style="font-size:56px;margin-bottom:12px;">🎉</div>
-      <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Thank you!</h2>
-      <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:24px;">Your testimonial is live.</p>
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;color:#3d2c1e;">Thank you!</h2>
+      <p style="font-size:13px;color:#a07850;margin-bottom:24px;">Your testimonial is live.</p>
       <div id="success-preview" class="t-card p-5 text-left mb-6"></div>
       <div class="flex gap-3 justify-center">
         <button class="btn-ghost" onclick="showView('gallery')">View All</button>
@@ -353,14 +366,14 @@
   <div id="view-gallery" class="hidden min-h-screen pt-24 pb-12 px-4">
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-8 fade-up">
-        <img src="logo.png" alt="Tark" style="height:22px;opacity:0.7;margin:0 auto 12px;" />
-        <h2 style="font-size:22px;font-weight:700;">Workshop Experiences</h2>
-        <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:3px;">Hosted by Aman Raj Yadav</p>
-        <p id="gallery-subtitle" style="font-size:13px;color:rgba(165,180,252,0.6);margin-top:4px;"></p>
+        <img src="logo.png" alt="Tark" style="height:22px;margin:0 auto 12px;filter:brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(10deg);opacity:0.8;" />
+        <h2 style="font-size:22px;font-weight:700;color:#3d2c1e;">Workshop Experiences</h2>
+        <p style="font-size:12px;color:#b08060;margin-top:3px;">Hosted by Aman Raj Yadav</p>
+        <p id="gallery-subtitle" style="font-size:13px;color:#f97316;font-weight:500;margin-top:4px;"></p>
       </div>
       <div id="gallery-grid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));"></div>
-      <div id="gallery-empty" class="hidden text-center py-20" style="color:rgba(255,255,255,0.25);">
-        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2" style="margin:0 auto 12px;opacity:0.4;">
+      <div id="gallery-empty" class="hidden text-center py-20" style="color:#c4a882;">
+        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="1.2" style="margin:0 auto 12px;opacity:0.4;">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
         <p style="font-size:14px;">No testimonials yet — be the first!</p>
@@ -576,26 +589,26 @@
 
     function buildCardHtml(t) {
       const stars = t.rating
-        ? `<span style="color:#fbbf24;font-size:12px;">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>`
+        ? `<span style="color:#f97316;font-size:12px;">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>`
         : '';
       const time  = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const initials = (t.name || '?').charAt(0).toUpperCase();
       const avatarInner = t.photo_url
         ? `<img src="${t.photo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />`
-        : `<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;">${initials}</div>`;
+        : `<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;">${initials}</div>`;
 
       return `
         <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
           <div class="avatar-wrap" style="flex-shrink:0;"><div class="avatar-inner">${avatarInner}</div></div>
           <div>
-            <div style="font-weight:600;font-size:14px;">${esc(t.name)}</div>
+            <div style="font-weight:600;font-size:14px;color:#3d2c1e;">${esc(t.name)}</div>
             <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
               ${stars}
-              <span style="font-size:11px;color:rgba(255,255,255,0.3);">${time}</span>
+              <span style="font-size:11px;color:#c4a882;">${time}</span>
             </div>
           </div>
         </div>
-        <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;">${esc(t.feedback)}</p>
+        <p style="font-size:13px;color:#6b4e38;line-height:1.6;">${esc(t.feedback)}</p>
       `;
     }
 
