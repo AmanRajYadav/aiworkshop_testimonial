@@ -5,663 +5,763 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Tark AI Workshop — Share Your Experience</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; }
+    /* ── Tokens ──────────────────────────────────────────────── */
+    :root {
+      --bg:           #FFF8EF;
+      --surface:      #FFFFFF;
+      --warm:         #FEF3E8;
+      --accent:       #F26419;
+      --accent-hover: #D9520D;
+      --accent-dim:   #FDE8D0;
+      --text:         #2C1810;
+      --text-mid:     #7A4F38;
+      --text-soft:    #B8906E;
+      --border:       #EDD5B8;
+      --green:        #4ADE80;
+      --star:         #F59E0B;
+      --r:            14px;
+      --r-sm:         10px;
+      --sh:           0 2px 16px rgba(242,100,25,.07), 0 1px 3px rgba(44,24,16,.04);
+      --sh-lg:        0 8px 36px rgba(242,100,25,.13), 0 2px 8px rgba(44,24,16,.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
 
     body {
-      background: linear-gradient(150deg, #fff8f0 0%, #ffecd2 45%, #ffd6b0 100%);
-      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 70% 50% at 90% 5%,  #FDE8D0 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 5%  95%, #FEF3E8 0%, transparent 60%);
+      min-height: 100dvh;
+      color: var(--text);
     }
 
-    /* Subtle noise texture overlay */
-    body::before {
+    /* Faint Tark triangle watermark */
+    body::after {
       content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      position: fixed;
+      top: -40px; right: -40px;
+      width: 340px; height: 340px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 87'%3E%3Cpolygon points='50,2 98,86 2,86' fill='none' stroke='%23F26419' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center / contain;
+      opacity: .06;
       pointer-events: none;
+      z-index: 0;
     }
 
-    /* Header */
-    .glass {
-      background: rgba(255,255,255,0.82);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(249,115,22,0.12);
-      box-shadow: 0 1px 12px rgba(249,115,22,0.06);
+    /* ── Header ───────────────────────────────────────────────── */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(255,248,239,.9);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 11px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-logo {
+      height: 24px;
+      filter: brightness(0) saturate(100%) invert(36%) sepia(65%) saturate(700%) hue-rotate(8deg);
+      opacity: .88;
+    }
+    .nav {
+      display: flex; gap: 3px;
+      background: var(--accent-dim);
+      border-radius: 999px;
+      padding: 3px;
+    }
+    .nav-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 999px; border: none;
+      cursor: pointer;
+      background: transparent; color: var(--text-mid);
+      transition: all .18s;
+    }
+    .nav-btn.active {
+      background: var(--accent); color: white;
+      box-shadow: 0 2px 8px rgba(242,100,25,.3);
+    }
+    .nav-badge { font-size: 10px; font-weight: 700; color: var(--accent); margin-left: 2px; }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    .footer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(255,248,239,.92);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-label { font-size: 11px; font-weight: 500; color: var(--text-soft); }
+    .social-row { display: flex; gap: 6px; }
+    .social-btn {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: var(--warm); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; transition: all .18s;
+    }
+    .social-btn svg { transition: all .18s; }
+    .social-btn:hover {
+      background: var(--accent); border-color: var(--accent);
+    }
+    .social-btn:hover svg { fill: white !important; stroke: white !important; }
+
+    /* ── Views ────────────────────────────────────────────────── */
+    .view { display: none; min-height: 100dvh; padding: 72px 20px 72px; }
+    .view.active { display: flex; flex-direction: column; align-items: center; }
+
+    /* ── Submit ───────────────────────────────────────────────── */
+    .hero {
+      width: 100%; max-width: 420px;
+      text-align: center;
+      padding: 24px 0 20px;
+    }
+    .session-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(242,100,25,.22);
+      border-radius: 999px;
+      padding: 5px 14px;
+      margin-bottom: 22px;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .host-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; margin-bottom: 20px;
+    }
+    .host-avatar-wrap { position: relative; flex-shrink: 0; }
+    .host-ring {
+      background: linear-gradient(135deg,#F26419,#FB7185,#86EFAC);
+      border-radius: 50%; padding: 2.5px; display: inline-block;
+    }
+    .host-avatar {
+      width: 58px; height: 58px; border-radius: 50%;
+      object-fit: cover; object-position: center top;
+      display: block; background: white;
+    }
+    .host-live {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--green); border: 2.5px solid var(--bg);
+    }
+    .host-info { text-align: left; }
+    .host-eyebrow {
+      font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--text-soft); margin-bottom: 2px;
+    }
+    .host-name  { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .host-sub   { font-size: 12px; font-weight: 500; color: var(--accent); margin-top: 1px; }
+
+    .hero-headline {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(26px, 7vw, 34px);
+      font-weight: 400; line-height: 1.2;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .hero-headline em { font-style: italic; color: var(--accent); }
+    .hero-sub { font-size: 13px; color: var(--text-soft); }
+
+    /* ── Form card ────────────────────────────────────────────── */
+    .form-card {
+      width: 100%; max-width: 420px;
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--sh);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .form-card-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #F26419, #FB923C, #FBBF24);
     }
 
-    /* Form card */
-    .glass-card {
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(249,180,100,0.25);
-      box-shadow: 0 4px 32px rgba(249,115,22,0.08);
+    /* Photo section */
+    .photo-section {
+      padding: 22px 20px 16px;
+      background: var(--warm);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer;
+      transition: background .2s;
+      user-select: none;
     }
+    .photo-section:hover { background: #FDE8D0; }
 
-    /* Inputs */
+    .photo-circle {
+      width: 96px; height: 96px; border-radius: 50%;
+      border: 2px dashed rgba(242,100,25,.38);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,100,25,.05);
+      margin-bottom: 10px;
+      transition: border-color .2s, background .2s;
+      animation: breathe 3s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%,100% { box-shadow: 0 0 0 0   rgba(242,100,25,.18); }
+      50%      { box-shadow: 0 0 0 9px rgba(242,100,25,.0);  }
+    }
+    .photo-section:hover .photo-circle {
+      border-color: var(--accent);
+      background: rgba(242,100,25,.1);
+      animation: none;
+    }
+    .photo-img {
+      width: 96px; height: 96px; border-radius: 50%;
+      object-fit: cover; display: none; margin-bottom: 10px;
+    }
+    .photo-ring-preview {
+      background: linear-gradient(135deg,#F26419,#FB7185,#86EFAC);
+      border-radius: 50%; padding: 2.5px;
+      display: none; margin-bottom: 10px;
+    }
+    .photo-ring-preview .photo-img { margin-bottom: 0; }
+
+    .photo-lbl  { font-size: 13px; font-weight: 500; color: var(--text-mid); margin-bottom: 2px; }
+    .photo-hint { font-size: 11px; color: var(--text-soft); }
+
+    /* Photo option sheet */
+    .photo-sheet {
+      width: 100%; max-width: 420px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--sh);
+      display: none;
+      margin-top: 6px;
+    }
+    .photo-sheet.open { display: block; }
+    .sheet-btn {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      padding: 13px 18px; background: none; border: none;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      color: var(--text-mid); cursor: pointer;
+      transition: background .15s;
+    }
+    .sheet-btn:hover { background: var(--warm); color: var(--accent); }
+    .sheet-divider { height: 1px; background: var(--border); }
+
+    /* Fields */
+    .form-inner { padding: 22px; }
+    .field-group { margin-bottom: 18px; }
+    .field-lbl {
+      display: block; font-size: 11px; font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--text-soft); margin-bottom: 7px;
+    }
     .field {
-      background: #fffaf5;
-      border: 1.5px solid #fcd9b0;
-      color: #3d2c1e;
-      width: 100%;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 14px;
+      width: 100%; background: var(--warm);
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      padding: 11px 14px;
+      font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text);
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color .18s, box-shadow .18s, background .18s;
+      -webkit-appearance: none;
     }
     .field:focus {
-      border-color: #f97316;
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+      border-color: var(--accent); background: white;
+      box-shadow: 0 0 0 3px rgba(242,100,25,.12);
     }
-    .field::placeholder { color: #c4a882; }
-
-    /* Photo area */
-    .photo-drop {
-      background: rgba(249,115,22,0.05);
-      border: 2px dashed rgba(249,115,22,0.3);
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .photo-drop:hover, .photo-drop.active {
-      background: rgba(249,115,22,0.1);
-      border-color: rgba(249,115,22,0.6);
-    }
+    .field::placeholder { color: var(--text-soft); opacity: .75; }
+    textarea.field { resize: none; line-height: 1.55; }
 
     /* Stars */
-    .star { cursor: pointer; font-size: 26px; color: #e8cba8; transition: color 0.15s, transform 0.15s; }
-    .star:hover, .star.lit { color: #f97316; }
-    .star:hover { transform: scale(1.15); }
+    .stars { display: flex; gap: 3px; align-items: center; }
+    .star {
+      font-size: 27px; color: #EDD5B8;
+      cursor: pointer; user-select: none;
+      transition: color .12s, transform .12s;
+      line-height: 1;
+    }
+    .star.lit { color: var(--star); }
+    .star:hover { transform: scale(1.18); }
+    .star-lbl { font-size: 12px; font-weight: 600; color: var(--accent); margin-left: 6px; }
 
     /* Buttons */
+    .btn {
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      border-radius: var(--r-sm); border: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      transition: transform .18s, box-shadow .18s, background .18s;
+      letter-spacing: .01em;
+    }
     .btn-primary {
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      color: white;
-      font-weight: 600;
-      font-size: 14px;
-      border-radius: 12px;
-      padding: 14px 24px;
-      width: 100%;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      width: 100%; padding: 14px 24px;
+      background: var(--accent); color: white;
     }
     .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(249,115,22,0.35);
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(242,100,25,.34);
     }
     .btn-primary:active:not(:disabled) { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
 
     .btn-ghost {
-      background: rgba(249,115,22,0.08);
-      color: #c2601a;
-      font-size: 13px;
-      border-radius: 8px;
-      padding: 8px 16px;
-      border: 1px solid rgba(249,115,22,0.18);
-      cursor: pointer;
-      transition: background 0.2s;
+      padding: 10px 20px;
+      background: var(--warm); color: var(--text-mid);
+      border: 1px solid var(--border);
     }
-    .btn-ghost:hover { background: rgba(249,115,22,0.15); }
+    .btn-ghost:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 
-    /* Nav pill */
-    .nav-pill { font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 999px; border: none; cursor: pointer; transition: all 0.2s; }
-    .nav-pill.active { background: rgba(249,115,22,0.12); color: #c2540a; font-weight: 600; }
-    .nav-pill.inactive { background: transparent; color: #b08060; }
-    .nav-pill.inactive:hover { color: #c2540a; background: rgba(249,115,22,0.06); }
-
-    /* Testimonial card */
-    .t-card {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(249,180,100,0.2);
-      border-radius: 18px;
-      box-shadow: 0 2px 16px rgba(249,115,22,0.06);
-      transition: transform 0.25s, box-shadow 0.25s;
+    /* Error */
+    .err-box {
+      background: #FEF2F2; border: 1px solid #FCA5A5; color: #B91C1C;
+      border-radius: var(--r-sm); padding: 10px 14px;
+      font-size: 13px; margin-bottom: 14px; display: none;
     }
-    .t-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(249,115,22,0.13);
-    }
-
-    /* Avatar ring */
-    .avatar-wrap {
-      background: linear-gradient(135deg, #f97316, #fb7185, #86efac);
-      padding: 2.5px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .avatar-inner { border-radius: 50%; overflow: hidden; background: white; }
+    .err-box.show { display: block; }
 
     /* Spinner */
     .spin {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(249,115,22,0.2);
-      border-top-color: #f97316;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
       border-radius: 50%;
-      animation: spinning 0.7s linear infinite;
+      animation: spinning .65s linear infinite;
     }
     @keyframes spinning { to { transform: rotate(360deg); } }
 
-    /* Animations */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* ── Success ──────────────────────────────────────────────── */
+    #view-success { justify-content: center; }
+    .success-wrap {
+      width: 100%; max-width: 400px; text-align: center;
+      animation: pop-in .4s ease forwards;
     }
-    @keyframes popIn {
-      0%   { opacity: 0; transform: scale(0.85); }
-      65%  { transform: scale(1.04); }
-      100% { opacity: 1; transform: scale(1); }
+    @keyframes pop-in {
+      0%   { opacity:0; transform:scale(.88); }
+      65%  { transform:scale(1.03); }
+      100% { opacity:1; transform:scale(1); }
     }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    .success-emoji { font-size: 52px; margin-bottom: 12px; }
+    .success-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 30px; color: var(--text); margin-bottom: 6px;
+    }
+    .success-sub { font-size: 13px; color: var(--text-soft); margin-bottom: 22px; }
+    .success-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--r); padding: 18px; text-align: left;
+      box-shadow: var(--sh); margin-bottom: 18px;
+    }
+    .success-btns { display: flex; gap: 10px; justify-content: center; }
+
+    /* ── Gallery ──────────────────────────────────────────────── */
+    .gallery-head { text-align: center; width: 100%; margin-bottom: 24px; padding-top: 8px; }
+    .gallery-logo {
+      height: 20px; display: block; margin: 0 auto 12px;
+      filter: brightness(0) saturate(100%) invert(36%) sepia(65%) saturate(700%) hue-rotate(8deg);
+      opacity: .75;
+    }
+    .gallery-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 28px; color: var(--text); margin-bottom: 4px;
+    }
+    .gallery-meta  { font-size: 12px; color: var(--text-soft); }
+    .gallery-count { font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 3px; }
+
+    .gallery-grid {
+      width: 100%; max-width: 960px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .t-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--r); padding: 18px;
+      box-shadow: var(--sh);
+      transition: transform .2s, box-shadow .2s;
+      opacity: 0;
+      animation: fade-up .45s ease forwards;
+    }
+    .t-card:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+    @keyframes fade-up {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
     }
 
-    .fade-up { animation: fadeUp 0.5s ease forwards; }
-    .pop-in  { animation: popIn  0.45s ease forwards; }
-
-    .stagger-1 { animation-delay: 0.05s; }
-    .stagger-2 { animation-delay: 0.1s; }
-    .stagger-3 { animation-delay: 0.15s; }
-    .stagger-4 { animation-delay: 0.2s; }
-
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
-      animation: pulse-dot 1.5s ease-in-out infinite;
+    .avatar-ring {
+      background: linear-gradient(135deg,#F26419,#FB7185,#86EFAC);
+      border-radius: 50%; padding: 2px;
+      display: inline-block; flex-shrink: 0;
     }
+    .avatar-inner { border-radius: 50%; overflow: hidden; display: block; background: var(--warm); }
 
-    /* Error */
-    .error-box {
-      background: rgba(239,68,68,0.07);
-      border: 1px solid rgba(239,68,68,0.25);
-      color: #b91c1c;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 13px;
+    .gallery-spinner {
+      width: 24px; height: 24px;
+      border: 2.5px solid var(--accent-dim);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spinning .7s linear infinite;
+      margin: 60px auto;
     }
+    .gallery-empty {
+      text-align: center; padding: 60px 0;
+      color: var(--text-soft); font-size: 14px;
+    }
+    .gallery-empty-icon { font-size: 38px; margin-bottom: 10px; opacity: .4; }
 
-    /* Scrollbar */
+    /* ── Misc ─────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.25); border-radius: 4px; }
-
-    /* Label */
-    .lbl { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #b08060; margin-bottom: 8px; }
-
-    /* Photo option sheet */
-    .option-sheet {
-      background: rgba(255,252,248,0.98);
-      border: 1px solid #fcd9b0;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-top: 8px;
-      box-shadow: 0 4px 20px rgba(249,115,22,0.1);
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; }
     }
-    .option-btn {
-      width: 100%; background: none; border: none; color: #6b4226;
-      font-size: 13px; padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px;
-      transition: background 0.15s;
-    }
-    .option-btn:hover { background: rgba(249,115,22,0.06); }
-    .option-divider { height: 1px; background: #fcd9b0; }
   </style>
 </head>
-<body class="min-h-screen" style="color:#3d2c1e;">
+<body>
 
-  <!-- ─── HEADER ─── -->
-  <header class="fixed top-0 left-0 right-0 z-50 glass">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Tark logo -->
-      <img src="logo.png" alt="Tark" style="height:28px;filter:brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(10deg);opacity:0.9;" />
-      <nav class="flex gap-1">
-        <button id="nav-submit" class="nav-pill active" onclick="showView('submit')">Share</button>
-        <button id="nav-gallery" class="nav-pill inactive" onclick="showView('gallery')">
-          Wall
-          <span id="gallery-badge" class="hidden ml-1" style="color:#f97316;font-weight:600;"></span>
-        </button>
-      </nav>
-    </div>
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header class="header">
+    <img src="logo.png" alt="Tark" class="header-logo" />
+    <nav class="nav">
+      <button id="nav-submit"  class="nav-btn active" onclick="showView('submit')">Share</button>
+      <button id="nav-gallery" class="nav-btn"        onclick="showView('gallery')">
+        Wall<span id="gallery-badge" class="nav-badge" style="display:none;"></span>
+      </button>
+    </nav>
   </header>
 
-  <!-- ─── SUBMIT VIEW ─── -->
-  <div id="view-submit" class="min-h-screen flex items-start justify-center px-4 pt-24 pb-24">
-    <div class="w-full max-w-md">
+  <!-- ── Submit View ─────────────────────────────────────────── -->
+  <div id="view-submit" class="view active">
 
-      <!-- Hero -->
-      <div class="text-center mb-7 fade-up">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5" style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);font-size:12px;font-weight:500;color:#c2540a;">
-          <div class="live-dot"></div>
-          Today's session
-        </div>
+    <div class="hero">
+      <div class="session-pill"><span class="live-dot"></span>Today's session</div>
 
-        <!-- Host card -->
-        <div class="flex items-center justify-center gap-4 mb-5">
-          <div style="position:relative;flex-shrink:0;">
-            <!-- Gradient ring -->
-            <div style="background:linear-gradient(135deg,#f97316,#fb7185,#86efac);border-radius:50%;padding:2.5px;display:inline-block;">
-              <img src="host.png" alt="Aman Raj Yadav"
-                style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;display:block;" />
-            </div>
-            <!-- Live badge -->
-            <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:#22c55e;border-radius:50%;border:2px solid #fff8f0;"></div>
+      <div class="host-row">
+        <div class="host-avatar-wrap">
+          <div class="host-ring">
+            <img src="host.png" alt="Aman Raj Yadav" class="host-avatar" />
           </div>
-          <div class="text-left">
-            <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#b08060;margin-bottom:2px;">Hosted by</div>
-            <div style="font-size:17px;font-weight:700;line-height:1.2;color:#3d2c1e;">Aman Raj Yadav</div>
-            <div style="font-size:12px;color:#f97316;font-weight:500;margin-top:2px;">AI Workshop</div>
-          </div>
+          <div class="host-live"></div>
         </div>
-
-        <h1 style="font-size:clamp(22px,5vw,28px);font-weight:800;line-height:1.25;background:linear-gradient(135deg,#c2540a,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-          How was your experience?
-        </h1>
-        <p style="font-size:13px;color:#a07850;margin-top:6px;">
-          Your feedback helps us make the next one even better.
-        </p>
+        <div class="host-info">
+          <div class="host-eyebrow">Hosted by</div>
+          <div class="host-name">Aman Raj Yadav</div>
+          <div class="host-sub">AI Workshop</div>
+        </div>
       </div>
 
-      <!-- Card -->
-      <div id="form-card" class="glass-card rounded-2xl p-6 fade-up stagger-1">
+      <h1 class="hero-headline">What did you <em>experience</em> today?</h1>
+      <p class="hero-sub">Your honest feedback shapes what comes next.</p>
+    </div>
 
-        <!-- Photo -->
-        <div class="mb-5">
-          <label class="lbl">Your Photo</label>
-          <div id="photo-drop" class="photo-drop p-5 flex flex-col items-center gap-2" onclick="togglePhotoSheet()">
-            <div id="photo-placeholder-ui">
-              <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="rgba(249,115,22,0.6)" stroke-width="1.4" style="margin:0 auto 6px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <p style="font-size:13px;color:#a07850;text-align:center;">Tap to add your photo</p>
-              <p style="font-size:11px;color:#c4a882;text-align:center;margin-top:3px;">Camera or gallery</p>
-            </div>
-            <div id="photo-preview-ui" class="hidden flex-col items-center gap-2">
-              <div class="avatar-wrap">
-                <div class="avatar-inner" style="width:72px;height:72px;">
-                  <img id="photo-preview-img" style="width:72px;height:72px;object-fit:cover;" />
-                </div>
-              </div>
-              <p style="font-size:11px;color:#c4a882;">Tap to change</p>
-            </div>
-            <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="onPhotoSelected(event)" />
-          </div>
-          <!-- Option sheet -->
-          <div id="photo-sheet" class="option-sheet hidden">
-            <button class="option-btn" onclick="captureCamera()">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              Take Photo
-            </button>
-            <div class="option-divider"></div>
-            <button class="option-btn" onclick="pickGallery()">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              Choose from Gallery
-            </button>
-          </div>
+    <div class="form-card">
+      <div class="form-card-bar"></div>
+
+      <!-- Photo -->
+      <div class="photo-section" id="photo-section" onclick="toggleSheet()">
+        <div class="photo-circle" id="photo-circle">
+          <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="rgba(242,100,25,.55)" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
         </div>
+        <div id="photo-ring-preview" class="photo-ring-preview">
+          <img id="photo-img" class="photo-img" alt="Preview" />
+        </div>
+        <p class="photo-lbl"  id="photo-lbl">Add your photo</p>
+        <p class="photo-hint" id="photo-hint">Tap to take or choose from gallery</p>
+        <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="onPhotoSelected(event)" />
+      </div>
 
-        <!-- Name -->
-        <div class="mb-5">
-          <label class="lbl" for="inp-name">Full Name</label>
+      <div id="photo-sheet" class="photo-sheet">
+        <button class="sheet-btn" onclick="captureCamera()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#F26419" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Take Photo
+        </button>
+        <div class="sheet-divider"></div>
+        <button class="sheet-btn" onclick="pickGallery()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#F26419" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Choose from Gallery
+        </button>
+      </div>
+
+      <div class="form-inner">
+        <div class="field-group">
+          <label class="field-lbl" for="inp-name">Full Name</label>
           <input id="inp-name" class="field" type="text" placeholder="e.g. Priya Sharma" autocomplete="name" />
         </div>
 
-        <!-- Rating -->
-        <div class="mb-5">
-          <label class="lbl">How would you rate it?</label>
-          <div id="star-row" class="flex gap-1 items-center">
+        <div class="field-group">
+          <label class="field-lbl">Rating</label>
+          <div class="stars">
             <span class="star" data-v="1" onclick="setRating(1)">★</span>
             <span class="star" data-v="2" onclick="setRating(2)">★</span>
             <span class="star" data-v="3" onclick="setRating(3)">★</span>
             <span class="star" data-v="4" onclick="setRating(4)">★</span>
             <span class="star" data-v="5" onclick="setRating(5)">★</span>
-            <span id="rating-label" style="font-size:12px;color:#f97316;font-weight:500;margin-left:8px;"></span>
+            <span id="star-lbl" class="star-lbl"></span>
           </div>
         </div>
 
-        <!-- Feedback -->
-        <div class="mb-6">
-          <label class="lbl" for="inp-feedback">Your Feedback</label>
-          <textarea id="inp-feedback" class="field" rows="4" style="resize:none;" placeholder="What did you learn? What surprised you? How will you apply this in your work?"></textarea>
+        <div class="field-group">
+          <label class="field-lbl" for="inp-feedback">Your Feedback</label>
+          <textarea id="inp-feedback" class="field" rows="4" placeholder="What did you learn? What surprised you? How will you apply this?"></textarea>
         </div>
 
-        <!-- Error -->
-        <div id="err-box" class="error-box hidden mb-4"></div>
+        <div id="err-box" class="err-box"></div>
 
-        <!-- Submit -->
-        <button id="btn-submit" class="btn-primary" onclick="doSubmit()">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <button id="btn-submit" class="btn btn-primary" onclick="doSubmit()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
           </svg>
           Share My Experience
         </button>
       </div>
     </div>
+
   </div>
 
-  <!-- ─── SUCCESS VIEW ─── -->
-  <div id="view-success" class="hidden min-h-screen flex items-center justify-center px-4 pt-20">
-    <div class="w-full max-w-sm text-center pop-in">
-      <div style="font-size:56px;margin-bottom:12px;">🎉</div>
-      <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;color:#3d2c1e;">Thank you!</h2>
-      <p style="font-size:13px;color:#a07850;margin-bottom:24px;">Your testimonial is live.</p>
-      <div id="success-preview" class="t-card p-5 text-left mb-6"></div>
-      <div class="flex gap-3 justify-center">
-        <button class="btn-ghost" onclick="showView('gallery')">View All</button>
-        <button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="resetForm()">Submit Another</button>
+  <!-- ── Success View ────────────────────────────────────────── -->
+  <div id="view-success" class="view">
+    <div class="success-wrap">
+      <div class="success-emoji">🎉</div>
+      <h2 class="success-title">Thank you!</h2>
+      <p class="success-sub">Your testimonial is now live on the wall.</p>
+      <div id="success-card" class="success-card"></div>
+      <div class="success-btns">
+        <button class="btn btn-ghost" onclick="showView('gallery')">View Wall</button>
+        <button class="btn btn-primary" style="width:auto;padding:10px 22px;" onclick="resetForm()">Submit Another</button>
       </div>
     </div>
   </div>
 
-  <!-- ─── GALLERY VIEW ─── -->
-  <div id="view-gallery" class="hidden min-h-screen pt-24 pb-24 px-4">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-8 fade-up">
-        <img src="logo.png" alt="Tark" style="height:22px;margin:0 auto 12px;filter:brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(10deg);opacity:0.8;" />
-        <h2 style="font-size:22px;font-weight:700;color:#3d2c1e;">Workshop Experiences</h2>
-        <p style="font-size:12px;color:#b08060;margin-top:3px;">Hosted by Aman Raj Yadav</p>
-        <p id="gallery-subtitle" style="font-size:13px;color:#f97316;font-weight:500;margin-top:4px;"></p>
-      </div>
-      <div id="gallery-grid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));"></div>
-      <div id="gallery-empty" class="hidden text-center py-20" style="color:#c4a882;">
-        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="1.2" style="margin:0 auto 12px;opacity:0.4;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+  <!-- ── Gallery View ────────────────────────────────────────── -->
+  <div id="view-gallery" class="view">
+    <div class="gallery-head">
+      <img src="logo.png" alt="Tark" class="gallery-logo" />
+      <h2 class="gallery-title">Workshop Experiences</h2>
+      <p class="gallery-meta">Hosted by Aman Raj Yadav</p>
+      <p id="gallery-count" class="gallery-count"></p>
+    </div>
+    <div id="gallery-spinner" class="gallery-spinner"></div>
+    <div id="gallery-grid"   class="gallery-grid"   style="display:none;"></div>
+    <div id="gallery-empty"  class="gallery-empty"  style="display:none;">
+      <div class="gallery-empty-icon">💬</div>
+      <p>No testimonials yet — be the first!</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <span class="footer-label">Follow Aman Raj Yadav</span>
+    <div class="social-row">
+
+      <a href="https://instagram.com/amanry.28" target="_blank" rel="noopener" class="social-btn" title="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F26419" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r=".8" fill="#F26419" stroke="none"/>
         </svg>
-        <p style="font-size:14px;">No testimonials yet — be the first!</p>
-      </div>
-      <div id="gallery-loading" class="flex justify-center py-16">
-        <div class="spin"></div>
-      </div>
-    </div>
-  </div>
+      </a>
 
-  <!-- ─── FOOTER ─── -->
-  <footer style="position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(255,255,255,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(249,115,22,0.12);padding:10px 16px;">
-    <div style="max-width:500px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-      <span style="font-size:11px;color:#b08060;font-weight:500;">Follow Aman Raj Yadav</span>
-      <div style="display:flex;align-items:center;gap:6px;">
+      <a href="https://x.com/amanry28" target="_blank" rel="noopener" class="social-btn" title="X / Twitter">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F26419">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.243 5.608 5.833-5.608Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
+        </svg>
+      </a>
 
-        <!-- Instagram -->
-        <a href="https://instagram.com/amanry.28" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.18);transition:all 0.2s;text-decoration:none;"
-           onmouseover="this.style.background='rgba(249,115,22,0.18)'" onmouseout="this.style.background='rgba(249,115,22,0.08)'">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#e05a2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r="0.8" fill="#e05a2b" stroke="none"/>
-          </svg>
-        </a>
+      <a href="https://youtube.com/@amanrajyadav" target="_blank" rel="noopener" class="social-btn" title="YouTube">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="#F26419">
+          <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
+        </svg>
+      </a>
 
-        <!-- X / Twitter -->
-        <a href="https://x.com/amanry28" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.18);transition:all 0.2s;text-decoration:none;"
-           onmouseover="this.style.background='rgba(249,115,22,0.18)'" onmouseout="this.style.background='rgba(249,115,22,0.08)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#e05a2b">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.243 5.608 5.833-5.608Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
-          </svg>
-        </a>
-
-        <!-- YouTube -->
-        <a href="https://youtube.com/@amanrajyadav" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.18);transition:all 0.2s;text-decoration:none;"
-           onmouseover="this.style.background='rgba(249,115,22,0.18)'" onmouseout="this.style.background='rgba(249,115,22,0.08)'">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e05a2b">
-            <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
-          </svg>
-        </a>
-
-      </div>
     </div>
   </footer>
 
-  <!-- ─── SCRIPT ─── -->
+  <!-- ── Script ───────────────────────────────────────────────── -->
   <script>
-    const SUPABASE_URL  = 'https://qnyhxgikhuzebrvxdpes.supabase.co';
-    const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueWh4Z2lraHV6ZWJydnhkcGVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MzI1OTYsImV4cCI6MjA5ODIwODU5Nn0.eGEDwqyJrA7wDqfzCIxiG_fscvnNEs6MpyNDQUh1yWs';
+    const SUPABASE_URL = 'https://qnyhxgikhuzebrvxdpes.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueWh4Z2lraHV6ZWJydnhkcGVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MzI1OTYsImV4cCI6MjA5ODIwODU5Nn0.eGEDwqyJrA7wDqfzCIxiG_fscvnNEs6MpyNDQUh1yWs';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'];
+    const LABELS = ['','Poor','Fair','Good','Great','Excellent!'];
+    let photoFile = null, rating = 0;
 
-    let photoFile = null;
-    let currentRating = 0;
-
-    // ── Navigation ──────────────────────────────────────────
+    /* Navigation */
     function showView(name) {
-      ['submit','success','gallery'].forEach(v => {
-        document.getElementById(`view-${v}`).classList.add('hidden');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + name).classList.add('active');
+      ['submit','gallery'].forEach(n => {
+        document.getElementById('nav-' + n).classList.toggle('active',
+          n === name || (n === 'submit' && name === 'success'));
       });
-      document.getElementById(`view-${name}`).classList.remove('hidden');
-
-      document.getElementById('nav-submit').className = `nav-pill ${name === 'submit' || name === 'success' ? 'active' : 'inactive'}`;
-      document.getElementById('nav-gallery').className = `nav-pill ${name === 'gallery' ? 'active' : 'inactive'}`;
-
       if (name === 'gallery') loadGallery();
     }
 
-    // ── Photo ────────────────────────────────────────────────
-    function togglePhotoSheet() {
-      const sheet = document.getElementById('photo-sheet');
-      sheet.classList.toggle('hidden');
+    /* Photo */
+    function toggleSheet() {
+      document.getElementById('photo-sheet').classList.toggle('open');
     }
-
     function captureCamera() {
-      document.getElementById('photo-sheet').classList.add('hidden');
-      const inp = document.getElementById('photo-file-input');
-      inp.setAttribute('capture', 'user');
-      inp.accept = 'image/*';
-      inp.click();
+      document.getElementById('photo-sheet').classList.remove('open');
+      const f = document.getElementById('photo-file');
+      f.setAttribute('capture','user'); f.click();
     }
-
     function pickGallery() {
-      document.getElementById('photo-sheet').classList.add('hidden');
-      const inp = document.getElementById('photo-file-input');
-      inp.removeAttribute('capture');
-      inp.accept = 'image/*';
-      inp.click();
+      document.getElementById('photo-sheet').classList.remove('open');
+      const f = document.getElementById('photo-file');
+      f.removeAttribute('capture'); f.click();
     }
-
     function onPhotoSelected(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+      const file = e.target.files[0]; if (!file) return;
       photoFile = file;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        document.getElementById('photo-preview-img').src = ev.target.result;
-        document.getElementById('photo-placeholder-ui').classList.add('hidden');
-        document.getElementById('photo-preview-ui').classList.remove('hidden');
-        document.getElementById('photo-preview-ui').style.display = 'flex';
+      const r = new FileReader();
+      r.onload = ev => {
+        const img = document.getElementById('photo-img');
+        const ring = document.getElementById('photo-ring-preview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        ring.style.display = 'inline-block';
+        document.getElementById('photo-circle').style.display = 'none';
+        document.getElementById('photo-lbl').textContent  = 'Looking great!';
+        document.getElementById('photo-hint').textContent = 'Tap to change photo';
       };
-      reader.readAsDataURL(file);
+      r.readAsDataURL(file);
     }
 
-    // ── Rating ───────────────────────────────────────────────
+    /* Rating */
     function setRating(val) {
-      currentRating = val;
-      document.querySelectorAll('.star').forEach(s => {
-        s.classList.toggle('lit', +s.dataset.v <= val);
-      });
-      document.getElementById('rating-label').textContent = RATING_LABELS[val] || '';
+      rating = val;
+      document.querySelectorAll('.star[data-v]').forEach(s =>
+        s.classList.toggle('lit', +s.dataset.v <= val));
+      document.getElementById('star-lbl').textContent = LABELS[val] || '';
     }
 
-    // ── Submit ───────────────────────────────────────────────
+    /* Submit */
     async function doSubmit() {
       const name     = document.getElementById('inp-name').value.trim();
       const feedback = document.getElementById('inp-feedback').value.trim();
-
       if (!name)     { showErr('Please enter your name.'); return; }
       if (!feedback) { showErr('Please write your feedback.'); return; }
-      hideErr();
-      setBtnLoading(true);
-
+      hideErr(); setBtnLoading(true);
       try {
-        // 1. Upload photo
         let photo_url = null;
         if (photoFile) {
           const ext  = photoFile.name.split('.').pop() || 'jpg';
           const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
           const { error: upErr } = await db.storage
-            .from('testimonial-photos')
-            .upload(path, photoFile, { contentType: photoFile.type });
-
+            .from('testimonial-photos').upload(path, photoFile, { contentType: photoFile.type });
           if (!upErr) {
-            const { data: urlData } = db.storage
-              .from('testimonial-photos')
-              .getPublicUrl(path);
-            photo_url = urlData?.publicUrl || null;
+            const { data: u } = db.storage.from('testimonial-photos').getPublicUrl(path);
+            photo_url = u?.publicUrl || null;
           }
         }
-
-        // 2. Insert row
-        const payload = {
-          name,
-          feedback,
-          photo_url,
-          rating: currentRating || null
-        };
         const { data: row, error: dbErr } = await db
           .from('testimonials')
-          .insert([payload])
-          .select()
-          .single();
-
+          .insert([{ name, feedback, photo_url, rating: rating || null }])
+          .select().single();
         if (dbErr) throw dbErr;
-
-        // 3. Success
-        document.getElementById('success-preview').innerHTML = buildCardHtml(row);
-        showView('success');
-        updateGalleryBadge();
-
+        document.getElementById('success-card').innerHTML = cardHtml(row);
+        showView('success'); updateBadge();
       } catch (err) {
         console.error(err);
-        if (err.code === '42P01' || err.message?.includes('does not exist')) {
-          showErr('Database not set up yet — please run setup.sql in your Supabase SQL Editor first.');
-        } else {
-          showErr(err.message || 'Something went wrong. Please try again.');
-        }
-      } finally {
-        setBtnLoading(false);
-      }
+        showErr(err.code === '42P01' || err.message?.includes('does not exist')
+          ? 'Database not set up yet — run setup.sql in Supabase SQL Editor.'
+          : err.message || 'Something went wrong. Please try again.');
+      } finally { setBtnLoading(false); }
     }
 
-    function showErr(msg) {
-      const el = document.getElementById('err-box');
-      el.textContent = msg;
-      el.classList.remove('hidden');
-    }
-    function hideErr() { document.getElementById('err-box').classList.add('hidden'); }
-
+    function showErr(m) { const e = document.getElementById('err-box'); e.textContent = m; e.classList.add('show'); }
+    function hideErr()  { document.getElementById('err-box').classList.remove('show'); }
     function setBtnLoading(on) {
-      const btn = document.getElementById('btn-submit');
-      btn.disabled = on;
-      btn.innerHTML = on
+      const b = document.getElementById('btn-submit'); b.disabled = on;
+      b.innerHTML = on
         ? '<div class="spin"></div><span>Submitting…</span>'
-        : '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>Share My Experience';
+        : '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>Share My Experience';
     }
 
     function resetForm() {
-      document.getElementById('inp-name').value    = '';
+      document.getElementById('inp-name').value = '';
       document.getElementById('inp-feedback').value = '';
-      document.getElementById('photo-file-input').value = '';
-      document.getElementById('photo-placeholder-ui').classList.remove('hidden');
-      document.getElementById('photo-preview-ui').classList.add('hidden');
-      document.getElementById('photo-preview-ui').style.display = '';
-      document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
-      document.getElementById('rating-label').textContent = '';
-      photoFile = null;
-      currentRating = 0;
+      document.getElementById('photo-file').value = '';
+      document.getElementById('photo-img').style.display = 'none';
+      document.getElementById('photo-ring-preview').style.display = 'none';
+      document.getElementById('photo-circle').style.display = 'flex';
+      document.getElementById('photo-lbl').textContent  = 'Add your photo';
+      document.getElementById('photo-hint').textContent = 'Tap to take or choose from gallery';
+      document.querySelectorAll('.star[data-v]').forEach(s => s.classList.remove('lit'));
+      document.getElementById('star-lbl').textContent = '';
+      photoFile = null; rating = 0;
       showView('submit');
     }
 
-    // ── Gallery ──────────────────────────────────────────────
+    /* Gallery */
     async function loadGallery() {
-      const grid    = document.getElementById('gallery-grid');
-      const empty   = document.getElementById('gallery-empty');
-      const loading = document.getElementById('gallery-loading');
-
-      grid.innerHTML = '';
-      empty.classList.add('hidden');
-      loading.classList.remove('hidden');
-
-      const { data, error } = await db
-        .from('testimonials')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      loading.classList.add('hidden');
-
+      document.getElementById('gallery-spinner').style.display = 'block';
+      document.getElementById('gallery-grid').style.display   = 'none';
+      document.getElementById('gallery-empty').style.display  = 'none';
+      const { data, error } = await db.from('testimonials').select('*').order('created_at',{ascending:false});
+      document.getElementById('gallery-spinner').style.display = 'none';
       if (error) {
-        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(252,165,165,0.8);font-size:13px;">${esc(error.message)}</div>`;
+        document.getElementById('gallery-grid').style.display = 'grid';
+        document.getElementById('gallery-grid').innerHTML =
+          `<p style="color:#B91C1C;font-size:13px;grid-column:1/-1;">${esc(error.message)}</p>`;
         return;
       }
-
       const n = data.length;
-      document.getElementById('gallery-subtitle').textContent =
+      document.getElementById('gallery-count').textContent =
         n ? `${n} experience${n !== 1 ? 's' : ''} shared` : '';
-      document.getElementById('gallery-badge').textContent = n > 0 ? `${n}` : '';
-      document.getElementById('gallery-badge').classList.toggle('hidden', n === 0);
-
-      if (!n) { empty.classList.remove('hidden'); return; }
-
-      grid.innerHTML = data.map((t, i) => `
-        <div class="t-card p-5 fade-up" style="animation-delay:${Math.min(i*0.04,0.3)}s">
-          ${buildCardHtml(t)}
-        </div>
-      `).join('');
+      if (!n) { document.getElementById('gallery-empty').style.display = 'block'; return; }
+      document.getElementById('gallery-grid').style.display = 'grid';
+      document.getElementById('gallery-grid').innerHTML = data.map((t,i) =>
+        `<div class="t-card" style="animation-delay:${Math.min(i*.045,.28)}s;">${cardHtml(t)}</div>`
+      ).join('');
     }
 
-    async function updateGalleryBadge() {
-      const { count } = await db.from('testimonials').select('id', { count: 'exact', head: true });
-      if (count) {
-        document.getElementById('gallery-badge').textContent = count;
-        document.getElementById('gallery-badge').classList.remove('hidden');
-      }
+    async function updateBadge() {
+      const { count } = await db.from('testimonials').select('id',{count:'exact',head:true});
+      const b = document.getElementById('gallery-badge');
+      if (count) { b.textContent = ` ${count}`; b.style.display = 'inline'; }
     }
 
-    function buildCardHtml(t) {
+    function cardHtml(t) {
       const stars = t.rating
-        ? `<span style="color:#f97316;font-size:12px;">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>`
-        : '';
-      const time  = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const initials = (t.name || '?').charAt(0).toUpperCase();
-      const avatarInner = t.photo_url
-        ? `<img src="${t.photo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />`
-        : `<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;">${initials}</div>`;
-
+        ? `<span style="color:#F59E0B;font-size:12px;letter-spacing:1px;">${'★'.repeat(t.rating)}${'☆'.repeat(5-t.rating)}</span>` : '';
+      const time = new Date(t.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const init = (t.name||'?').charAt(0).toUpperCase();
+      const av = t.photo_url
+        ? `<img src="${t.photo_url}" style="width:44px;height:44px;object-fit:cover;border-radius:50%;display:block;">`
+        : `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F26419,#FB923C);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:white;">${init}</div>`;
       return `
-        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
-          <div class="avatar-wrap" style="flex-shrink:0;"><div class="avatar-inner">${avatarInner}</div></div>
-          <div>
-            <div style="font-weight:600;font-size:14px;color:#3d2c1e;">${esc(t.name)}</div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-              ${stars}
-              <span style="font-size:11px;color:#c4a882;">${time}</span>
-            </div>
+        <div style="display:flex;align-items:flex-start;gap:11px;margin-bottom:11px;">
+          <div class="avatar-ring"><div class="avatar-inner">${av}</div></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:14px;color:#2C1810;">${esc(t.name)}</div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:2px;">${stars}<span style="font-size:11px;color:#B8906E;">${time}</span></div>
           </div>
         </div>
-        <p style="font-size:13px;color:#6b4e38;line-height:1.6;">${esc(t.feedback)}</p>
-      `;
+        <p style="font-size:13px;color:#7A4F38;line-height:1.6;margin:0;">${esc(t.feedback)}</p>`;
     }
 
-    function esc(str) {
-      if (!str) return '';
-      return str
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
+    function esc(s) {
+      if (!s) return '';
+      const d = document.createElement('div');
+      d.appendChild(document.createTextNode(s));
+      return d.innerHTML;
     }
 
-    // ── Init ─────────────────────────────────────────────────
     showView('submit');
   </script>
 </body>
